@@ -15,7 +15,7 @@ import * as path from 'path';
  *
  *  TODO: - return a list of all possible unique ingredient types (baking/drinks etc)
  *
- *  TODO: - return a list of all possible recipes (with support for pagination)
+ *  DONE - return a list of all possible recipes (with support for pagination)
  *
  *  TODO: - return all of the recipes that use the provided products
  *
@@ -32,8 +32,16 @@ import * as path from 'path';
 export class RecipeService {
   constructor(@InjectModel(Recipe.name) private recipeModel: Model<Recipe>) {}
 
-  async listRecipes() {
-    return await this.recipeModel.find();
+  /**
+   * Returns recipes from database.
+   *
+   * @param [skip=0] - number of recipes to skip
+   * @param [limit=5] - limit of recipes returned
+   * @returns `Recipe[]` list
+   */
+  async listRecipes(skip = 0, limit = 5): Promise<Recipe[]> {
+    const recipes = await this.recipeModel.find().sort({ _id: 1 }).skip(skip).limit(limit);
+    return recipes;
   }
 
   /**
