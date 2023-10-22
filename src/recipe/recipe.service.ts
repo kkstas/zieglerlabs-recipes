@@ -19,7 +19,7 @@ import * as path from 'path';
  *
  *  TODO: - return all of the recipes that use the provided products
  *
- *  TODO: - return all of the recipes whose total cook time (sum of timers) will not exceed the provided value
+ *  DONE - return all of the recipes whose total cook time (sum of timers) will not exceed the provided value
  *
  *  DONE - return one recipe by provided ID
  *
@@ -31,6 +31,21 @@ import * as path from 'path';
 @Injectable()
 export class RecipeService {
   constructor(@InjectModel(Recipe.name) private recipeModel: Model<Recipe>) {}
+
+  /**
+   * Returns all recipes with cooking time less than `maxTime`
+   *
+   * @param maxTime - maximum cooking time for recipes
+   * @returns `Recipe` list
+   */
+  async getRecipesWithCookTimeLessThan(maxTime: number): Promise<Recipe[]> {
+    const recipes = await this.recipeModel.aggregate([
+      { $addFields: { totalTime: { $sum: '$timers' } } },
+      { $match: { totalTime: { $lt: maxTime } } },
+      { $unset: 'totalTime' },
+    ]);
+    return recipes;
+  }
 
   /**
    * Returns single recipe from database.
@@ -49,7 +64,7 @@ export class RecipeService {
    *
    * @param [skip=0] - number of recipes to skip
    * @param [limit=5] - limit of recipes returned
-   * @returns `Recipe[]` list
+   * @returns `Recipe` list
    */
   async listRecipes(skip = 0, limit = 5): Promise<Recipe[]> {
     const recipes = await this.recipeModel.find().sort({ _id: 1 }).skip(skip).limit(limit);
