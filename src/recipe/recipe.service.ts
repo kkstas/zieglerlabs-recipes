@@ -12,7 +12,7 @@ import { RecipePayload } from './model/recipe.payload';
  *  Please build a backend app that will be written in Nest.js and will use MongoDB.
  *
  *  API needs to be able to:
- *  TODO: - return a list of all possible unique ingredients (variations of products can be treated as unique ones)
+ *  DONE - return a list of all possible unique ingredients (variations of products can be treated as unique ones)
  *
  *  DONE - return a list of all possible unique ingredient types (baking/drinks etc)
  *
@@ -32,6 +32,20 @@ import { RecipePayload } from './model/recipe.payload';
 @Injectable()
 export class RecipeService {
   constructor(@InjectModel(Recipe.name) private recipeModel: Model<RecipePayload>) {}
+
+  /**
+   * Returns a list of all unique ingredients
+   *
+   * @returns list of strings with all unique ingredients
+   */
+  async getUniqueIngredients(): Promise<string[]> {
+    const result = await this.recipeModel.aggregate([
+      { $unwind: { path: '$ingredients' } },
+      { $group: { _id: '$ingredients.name' } },
+      { $sort: { _id: 1 } },
+    ]);
+    return result.map((el) => el._id);
+  }
 
   /**
    * Returns a list of all unique ingredient types

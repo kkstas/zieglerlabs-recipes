@@ -8,6 +8,13 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
 
+  @Get('/ingredients/unique')
+  @ApiOperation({ summary: 'Get unique ingredients.' })
+  @ApiResponse({ status: 200, description: 'list of unique ingredients' })
+  getUniqueIngredients() {
+    return this.recipeService.getUniqueIngredients();
+  }
+
   @Get('/ingredients/types')
   @ApiOperation({ summary: 'Get unique ingredient types.' })
   @ApiResponse({ status: 200, description: 'list of unique ingredient type strings' })
