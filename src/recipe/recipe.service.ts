@@ -5,6 +5,7 @@ import { Recipe } from './model/recipe.schema';
 import { CreateRecipeDto } from './dto/recipe.dto';
 import * as fs from 'fs';
 import * as path from 'path';
+import { RecipePayload } from './model/recipe.payload';
 
 /**
  *  ## Exercise 1
@@ -30,7 +31,7 @@ import * as path from 'path';
 
 @Injectable()
 export class RecipeService {
-  constructor(@InjectModel(Recipe.name) private recipeModel: Model<Recipe>) {}
+  constructor(@InjectModel(Recipe.name) private recipeModel: Model<RecipePayload>) {}
 
   /**
    * Returns a list of all unique ingredient types
@@ -52,7 +53,7 @@ export class RecipeService {
    * @param maxTime - maximum cooking time for recipes
    * @returns `Recipe` list
    */
-  async getRecipesWithCookTimeLessThan(maxTime: number): Promise<Recipe[]> {
+  async getRecipesWithCookTimeLessThan(maxTime: number): Promise<RecipePayload[]> {
     const recipes = await this.recipeModel.aggregate([
       { $addFields: { totalTime: { $sum: '$timers' } } },
       { $match: { totalTime: { $lt: maxTime } } },
@@ -67,7 +68,7 @@ export class RecipeService {
    * @param id - id of the `Recipe`
    * @returns `Recipe`
    */
-  async getRecipeById(id: string): Promise<Recipe> {
+  async getRecipeById(id: string): Promise<RecipePayload> {
     const recipe = await this.recipeModel.findOne({ _id: id });
     if (!recipe) throw new NotFoundException(`Recipe with id ${id} not found`);
     return recipe;
@@ -80,7 +81,7 @@ export class RecipeService {
    * @param [limit=5] - limit of recipes returned
    * @returns `Recipe` list
    */
-  async listRecipes(skip = 0, limit = 5): Promise<Recipe[]> {
+  async listRecipes(skip = 0, limit = 5): Promise<RecipePayload[]> {
     const recipes = await this.recipeModel.find().sort({ _id: 1 }).skip(skip).limit(limit);
     return recipes;
   }
