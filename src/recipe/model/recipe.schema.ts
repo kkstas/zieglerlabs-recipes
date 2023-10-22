@@ -17,7 +17,7 @@ class Ingredient extends Document {
 
 export const ingredientSchema = SchemaFactory.createForClass(Ingredient);
 
-@Schema({ collection: 'recipes' })
+@Schema({ collection: 'recipes', timestamps: true })
 export class Recipe extends Document {
   @Prop()
   name: string;
