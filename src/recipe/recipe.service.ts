@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Recipe } from './model/recipe.schema';
@@ -21,7 +21,7 @@ import * as path from 'path';
  *
  *  TODO: - return all of the recipes whose total cook time (sum of timers) will not exceed the provided value
  *
- *  TODO: - return one recipe by provided ID
+ *  DONE - return one recipe by provided ID
  *
  *  Tips:
  *  - You can normalize data, add IDs etc.
@@ -31,6 +31,18 @@ import * as path from 'path';
 @Injectable()
 export class RecipeService {
   constructor(@InjectModel(Recipe.name) private recipeModel: Model<Recipe>) {}
+
+  /**
+   * Returns single recipe from database.
+   *
+   * @param id - id of the `Recipe`
+   * @returns `Recipe`
+   */
+  async getRecipeById(id: string): Promise<Recipe> {
+    const recipe = await this.recipeModel.findOne({ _id: id });
+    if (!recipe) throw new NotFoundException(`Recipe with id ${id} not found`);
+    return recipe;
+  }
 
   /**
    * Returns recipes from database.
