@@ -26,10 +26,10 @@ export class RecipeController {
   @ApiOperation({ summary: 'List all recipes that use provided product(s) (e.g. "salt, sugar")' })
   @ApiResponse({ status: 200, description: 'list of recipes using provided product(s)' })
   getRecipesThatUseProvidedProducts(
-    @Query('products', new ParseArrayPipe({ items: String, separator: ',' }))
-    products: string[],
+    @Query('contains', new ParseArrayPipe({ items: String, separator: ',' }))
+    contains: string[],
   ) {
-    return this.recipeService.getRecipesThatUseProvidedProducts(products);
+    return this.recipeService.getRecipesThatUseProvidedProducts(contains);
   }
 
   @Get('/recipes')
