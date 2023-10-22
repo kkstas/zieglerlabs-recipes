@@ -7,6 +7,11 @@ import { ParamsWithId } from './dto/params-with-id.dto';
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
 
+  @Get('/ingredients/types')
+  getUniqueIngredientTypes() {
+    return this.recipeService.getUniqueIngredientTypes();
+  }
+
   @Get('/recipes')
   listRecipes(@Query() { skip, limit }: PaginationParams) {
     return this.recipeService.listRecipes(skip, limit);

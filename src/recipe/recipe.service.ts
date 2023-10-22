@@ -13,7 +13,7 @@ import * as path from 'path';
  *  API needs to be able to:
  *  TODO: - return a list of all possible unique ingredients (variations of products can be treated as unique ones)
  *
- *  TODO: - return a list of all possible unique ingredient types (baking/drinks etc)
+ *  DONE - return a list of all possible unique ingredient types (baking/drinks etc)
  *
  *  DONE - return a list of all possible recipes (with support for pagination)
  *
@@ -31,6 +31,20 @@ import * as path from 'path';
 @Injectable()
 export class RecipeService {
   constructor(@InjectModel(Recipe.name) private recipeModel: Model<Recipe>) {}
+
+  /**
+   * Returns a list of all unique ingredient types
+   *
+   * @returns list of strings with all unique ingredient type names
+   */
+  async getUniqueIngredientTypes(): Promise<string[]> {
+    const result = await this.recipeModel.aggregate([
+      { $unwind: { path: '$ingredients' } },
+      { $group: { _id: '$ingredients.type' } },
+      { $sort: { _id: 1 } },
+    ]);
+    return result.map((el) => el._id);
+  }
 
   /**
    * Returns all recipes with cooking time less than `maxTime`
