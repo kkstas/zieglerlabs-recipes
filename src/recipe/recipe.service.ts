@@ -18,7 +18,7 @@ import { RecipePayload } from './model/recipe.payload';
  *
  *  DONE - return a list of all possible recipes (with support for pagination)
  *
- *  TODO: - return all of the recipes that use the provided products
+ *  DONE - return all of the recipes that use the provided products
  *
  *  DONE - return all of the recipes whose total cook time (sum of timers) will not exceed the provided value
  *
@@ -73,6 +73,18 @@ export class RecipeService {
       { $match: { totalTime: { $lt: maxTime } } },
       { $unset: 'totalTime' },
     ]);
+    return recipes;
+  }
+
+  /**
+   * Return all recipes that use provided product(s)
+   *
+   * @param products - array of product(s) (e.g. salt, sugar)
+   * @returns `Recipe` list
+   */
+  async getRecipesThatUseProvidedProducts(products: string[]): Promise<RecipePayload[]> {
+    let matches = products.map((prod) => ({ $match: { 'ingredients.name': { $eq: prod } } }));
+    const recipes = await this.recipeModel.aggregate([...matches]);
     return recipes;
   }
 

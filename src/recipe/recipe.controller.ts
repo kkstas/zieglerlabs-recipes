@@ -1,4 +1,4 @@
-import { Controller, Param, Get, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Param, Get, Query, ParseIntPipe, ParseArrayPipe } from '@nestjs/common';
 import { RecipeService } from './recipe.service';
 import { PaginationParams } from './dto/pagination-params.dto';
 import { ParamsWithId } from './dto/params-with-id.dto';
@@ -22,6 +22,16 @@ export class RecipeController {
     return this.recipeService.getUniqueIngredientTypes();
   }
 
+  @Get('/recipes/products')
+  @ApiOperation({ summary: 'List all recipes that use provided product(s) (e.g. "salt, sugar")' })
+  @ApiResponse({ status: 200, description: 'list of recipes using provided product(s)' })
+  getRecipesThatUseProvidedProducts(
+    @Query('products', new ParseArrayPipe({ items: String, separator: ',' }))
+    products: string[],
+  ) {
+    return this.recipeService.getRecipesThatUseProvidedProducts(products);
+  }
+
   @Get('/recipes')
   @ApiOperation({ summary: 'List all recipes (with pagination support).' })
   @ApiResponse({ status: 200, description: 'list of recipes' })
@@ -37,6 +47,7 @@ export class RecipeController {
   }
 
   @Get('/')
+  @ApiOperation({ summary: 'Get recipes with cooking time shorter than `maxTime`' })
   @ApiResponse({ status: 200, description: 'recipes within cooking time boundary' })
   getRecipesWithCookTimeLessThan(@Query('maxTime', ParseIntPipe) maxTime: number) {
     return this.recipeService.getRecipesWithCookTimeLessThan(maxTime);
