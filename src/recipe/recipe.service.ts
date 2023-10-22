@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Recipe } from './model/recipe.schema';
@@ -6,28 +6,6 @@ import { CreateRecipeDto } from './dto/recipe.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { RecipePayload } from './model/recipe.payload';
-
-/**
- *  ## Exercise 1
- *  Please build a backend app that will be written in Nest.js and will use MongoDB.
- *
- *  API needs to be able to:
- *  DONE - return a list of all possible unique ingredients (variations of products can be treated as unique ones)
- *
- *  DONE - return a list of all possible unique ingredient types (baking/drinks etc)
- *
- *  DONE - return a list of all possible recipes (with support for pagination)
- *
- *  DONE - return all of the recipes that use the provided products
- *
- *  DONE - return all of the recipes whose total cook time (sum of timers) will not exceed the provided value
- *
- *  DONE - return one recipe by provided ID
- *
- *  Tips:
- *  - You can normalize data, add IDs etc.
- *  - There should be a data migration that will sync the data from the JSON with the local DB only once (at the initial app start)
- */
 
 @Injectable()
 export class RecipeService {
@@ -96,7 +74,6 @@ export class RecipeService {
    */
   async getRecipeById(id: string): Promise<RecipePayload> {
     const recipe = await this.recipeModel.findOne({ _id: id });
-    if (!recipe) throw new NotFoundException(`Recipe with id ${id} not found`);
     return recipe;
   }
 

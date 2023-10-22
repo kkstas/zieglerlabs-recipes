@@ -3,6 +3,7 @@ import { RecipeService } from './recipe.service';
 import { PaginationParams } from './dto/pagination-params.dto';
 import { ParamsWithId } from './dto/params-with-id.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 @Controller()
 export class RecipeController {
@@ -29,7 +30,18 @@ export class RecipeController {
     @Query('contains', new ParseArrayPipe({ items: String, separator: ',' }))
     contains: string[],
   ) {
+    if (!contains || contains.length == 0)
+      throw new BadRequestException(`Provide correct product names!`);
     return this.recipeService.getRecipesThatUseProvidedProducts(contains);
+  }
+
+  @Get('/recipes/query')
+  @ApiOperation({ summary: 'Get recipes with cooking time shorter than `maxTime`' })
+  @ApiResponse({ status: 200, description: 'recipes within cooking time boundary' })
+  getRecipesWithCookTimeLessThan(@Query('maxTime', ParseIntPipe) maxTime: number) {
+    if (!maxTime || maxTime <= 0)
+      throw new BadRequestException(`Provide correct maximum time value!`);
+    return this.recipeService.getRecipesWithCookTimeLessThan(maxTime);
   }
 
   @Get('/recipes')
@@ -43,13 +55,8 @@ export class RecipeController {
   @ApiOperation({ summary: 'Get recipe by id.' })
   @ApiResponse({ status: 200, description: 'recipe with matching id' })
   getRecipeById(@Param() { id }: ParamsWithId) {
-    return this.recipeService.getRecipeById(id);
-  }
-
-  @Get('/')
-  @ApiOperation({ summary: 'Get recipes with cooking time shorter than `maxTime`' })
-  @ApiResponse({ status: 200, description: 'recipes within cooking time boundary' })
-  getRecipesWithCookTimeLessThan(@Query('maxTime', ParseIntPipe) maxTime: number) {
-    return this.recipeService.getRecipesWithCookTimeLessThan(maxTime);
+    const recipe = this.recipeService.getRecipeById(id);
+    if (!recipe) throw new NotFoundException(`Recipe with id ${id} not found`);
+    return recipe;
   }
 }
