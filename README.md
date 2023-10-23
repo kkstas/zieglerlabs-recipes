@@ -1,10 +1,12 @@
 ## Run the app in Docker
 
+_[Docker](https://docs.docker.com/get-docker/) daemon must be running and [Docker Compose](https://docs.docker.com/compose/install/) must be installed to execute following commands._
+
 ```bash
-# build and run services in Docker
+# build and run app & db services in Docker
 npm run docker:start
 
-# wipe out previous app-related Docker services and build new ones
+# wipe out previous mongo/node containers & images, then build new ones
 npm run docker:cleanstart
 ```
 
